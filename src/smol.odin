@@ -83,7 +83,7 @@ ParseError :: enum {
 
 
 main :: proc() {
-	stream, err := open_stream("./arith.smol")
+	stream, err := open_stream("./smol-programs/arith.smol")
 	gen := new_generator()
 	reader: strings.Reader
 	strings.reader_init(&reader, stream.in_channel)
