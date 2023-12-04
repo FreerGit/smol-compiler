@@ -48,13 +48,13 @@ empty_var :: proc(gen: ^Generator, i: int) -> int {
 	return bottom_var(gen) + (4 * (i - 1))
 }
 
-is_alloc_var :: proc(gen: ^Generator, id: Identifier) -> bool {
-	_, ok := gen.vars[id.iden]
+is_alloc_var :: proc(gen: ^Generator, id: string) -> bool {
+	_, ok := gen.vars[id]
 	return ok
 }
 
 alloc_var :: proc(gen: ^Generator, id: Identifier) -> string {
-	if is_alloc_var(gen, id) {
+	if is_alloc_var(gen, id.iden) {
 		return var(gen, id)
 	} else {
 		gen.vars[id.iden] = empty_var(gen, 1)
