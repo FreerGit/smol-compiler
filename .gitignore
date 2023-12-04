@@ -1,3 +1,5 @@
 a.out
 smol-compiler
 *.bin
+*.o
+*.s
