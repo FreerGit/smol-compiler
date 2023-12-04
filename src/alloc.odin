@@ -8,7 +8,9 @@ bottom_var :: proc(gen: ^Generator) -> int {
 	acc := 0
 	for _, v in gen.vars {
 		if v >= acc {
-			acc += v + 4
+			acc = v + 4
+		} else {
+			acc = acc
 		}
 	}
 	return acc

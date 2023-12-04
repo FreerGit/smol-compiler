@@ -12,13 +12,21 @@ nix-shell --max-jobs auto
 
 A new shell will open with all necessary dependencies to build the compiler.
 
-To run (within nix-shell):
+To build (within nix-shell):
 ```console
-odin run ./src/smol.odin -file -- ./smol-programs/arith.smol
+odin build src -o:speed
 ```
 
-of course, you can pass any file with smol code, `arith.smol` is just an example.
+To run (within nix-shell):
+```console
+./src.bin smol-programs/read_write.smol
+```
+
+of course, you can pass any file with smol code, `read_write.smol` is just an example.
+
+You may see warnings when compiling depending on your system, it ~should~ still work.
 
 If you would rather use Odin directly without nix, please see Odin install docs: [Odin install docs](https://odin-lang.org/docs/install/)
 
+You also need to install gcc-multilib if you do not use nix.
 

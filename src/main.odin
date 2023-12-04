@@ -73,7 +73,7 @@ main :: proc() {
 	path_to_code, ok := slice.get(os.args, 1)
 	if !ok {
 		fmt.eprintln(
-			"Please provide a file to compile, visit /smol-programs for examples. \nRun as:\n	odin run <path_to_smol.odin> -file -- <path_to_your_smol_file>",
+			"Please provide a file to compile, visit /smol-programs for examples. \nRun as:\n	./src.bin <path_to_your_smol_file>",
 		)
 	} else {
 		compile(path_to_code)
