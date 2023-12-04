@@ -5,5 +5,5 @@ begin
     write (a,b);
     read(a,b);
     write (a+1, b+1);
-    write(2+a);
+    write(2-a);
 end

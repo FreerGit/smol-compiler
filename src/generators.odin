@@ -132,6 +132,57 @@ addop :: proc(gen: ^Generator, d: int, l: Token, r: Token) -> Token {
 	panic("Expected literal or identifier for add op")
 }
 
+generate_sub :: proc(gen: ^Generator, d: int, l: Token, r: Token) -> Token {
+	#partial switch id1 in l {
+	case Identifier:
+		v := temp_var(gen, d)
+		vi := var(gen, v)
+		generate_copy(gen, v, id1)
+		#partial switch id2 in r {
+		case Identifier:
+			op2(gen, "	sub   ", vi, var(gen, id2))
+			return v
+		case Literal:
+			buf: [16]u8
+			of_str := strconv.itoa(buf[:], id2.lit)
+			op2(gen, "	sub   ", vi, of_str)
+			return v
+		}
+	case Literal:
+		#partial switch id2 in r {
+		case Identifier:
+			v := temp_var(gen, d)
+			vi := var(gen, v)
+			generate_copy(gen, v, id1)
+			op2(gen, "	sub   ", vi, var(gen, id2))
+			return v
+		}
+
+	}
+	panic("generate add called with invalid args")
+}
+
+
+subop :: proc(gen: ^Generator, d: int, l: Token, r: Token) -> Token {
+	#partial switch left in l {
+	case Literal:
+		#partial switch right in r {
+		case Literal:
+			return Literal{left.lit - right.lit}
+		case Identifier:
+			return generate_sub(gen, d, r, l)
+		}
+	case Identifier:
+		#partial switch right in r {
+		case Literal:
+			return generate_sub(gen, d, l, r)
+		}
+	}
+
+	panic("Expected literal or identifier for add op")
+}
+
+
 generate_reads :: proc(gen: ^Generator, idens: ^[dynamic]Identifier) {
 	for id in idens {
 		op2(gen, "    lea", "   eax", var(gen, id))

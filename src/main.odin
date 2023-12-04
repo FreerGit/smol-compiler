@@ -211,6 +211,10 @@ expression :: proc(
 			match_token(s, .AddOp)
 			e := expression(s, gen, (d + 1)) or_return
 			return addop(gen, d, l, e), .None
+		} else if next == .SubOp {
+			match_token(s, .SubOp)
+			e := expression(s, gen, (d + 1)) or_return
+			return subop(gen, d, l, e), .None
 		}
 		return l, .None
 	}
