@@ -95,15 +95,15 @@ compile :: proc(file_path: string) {
 	nasm_argv := strings.clone_to_cstring(
 		strings.concatenate({"nasm -f elf ", output_file}),
 	)
-
-	libc.system(nasm_argv)
+	defer delete(nasm_argv)
 
 	file := chop_extension(file_path)
 	gcc_argv := strings.clone_to_cstring(
 		strings.concatenate({"gcc -m32 -o ", file, " ", file, ".o"}),
 	)
-	defer delete(nasm_argv)
+	defer delete(gcc_argv)
 
+	libc.system(nasm_argv)
 	libc.system(gcc_argv)
 }
 
@@ -121,7 +121,6 @@ parse :: proc(reader: strings.Reader, gen: ^Generator) {
 	if match_token(&s, .Begin) {
 		generate_begin(gen)
 		statements(&s, gen)
-		fmt.println("T", s)
 		if match_token(&s, .End) {
 			generate_end(gen)
 		} else {
@@ -145,15 +144,11 @@ statement :: proc(s: ^Scanner, gen: ^Generator) -> bool {
 		}
 	case Identifier:
 		stmt = assignment(s, gen)
-		fmt.println("here", v, stmt)
-
 	case:
-		fmt.println("HERExx")
 		stmt = false
 	}
 	if stmt {
 		if match_token(s, .SemiColon) {
-			fmt.println("HERE", s)
 			return true
 		} else {
 			panic("Statements must end with a semicolon")
@@ -210,10 +205,8 @@ expression :: proc(
 ) {
 	lp := primary(s, gen, d) or_return
 	l, ok := lp.?
-	fmt.println(lp, l, ok)
 	if ok {
 		next := next_token(s)
-		fmt.println(next)
 		if next == .AddOp {
 			match_token(s, .AddOp)
 			e := expression(s, gen, (d + 1)) or_return
@@ -226,13 +219,11 @@ expression :: proc(
 
 assignment :: proc(s: ^Scanner, gen: ^Generator) -> bool {
 	id, err := match_next(s)
-	fmt.println(id)
 	#partial switch i in id {
 	case Identifier:
 		if match_token(s, .Assign) {
 			new_var := is_alloc_var(gen, i.iden)
 			id2, _ := expression(s, gen, (1 + int(new_var)))
-			fmt.println("after exp", id2)
 			#partial switch i2 in id2 {
 			case Literal:
 				generate_assign(gen, id, id2)
@@ -241,7 +232,6 @@ assignment :: proc(s: ^Scanner, gen: ^Generator) -> bool {
 				generate_assign(gen, id, id2)
 				return true
 			case:
-				fmt.println("assignment: ", i2)
 				panic("Identifier or Literal expected")
 			}
 		}

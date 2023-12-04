@@ -21,9 +21,7 @@ temp_var :: proc(gen: ^Generator, i: int) -> Identifier {
 }
 
 var_addr :: proc(id: Identifier, gen: ^Generator) -> string {
-
 	if len(id.iden) > 6 && id.iden[0:6] == "__temp" {
-		fmt.println("slice", id.iden[6:])
 		sub := id.iden[6:][:len(id.iden) - 6]
 		return strings.concatenate({"[esp+", sub, "]"})
 	} else {
@@ -34,11 +32,9 @@ var_addr :: proc(id: Identifier, gen: ^Generator) -> string {
 			)
 		}
 		buf: [64]byte
-		fmt.println("var", var)
 		return strings.concatenate({"[esp+", strconv.itoa(buf[:], var), "]"})
 	}
 }
-
 
 var :: proc(gen: ^Generator, id: Identifier) -> string {
 	return strings.concatenate({"dword ", var_addr(id, gen)})

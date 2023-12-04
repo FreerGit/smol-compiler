@@ -3,3 +3,4 @@ smol-compiler
 *.bin
 *.o
 *.s
+read_write

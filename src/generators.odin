@@ -10,9 +10,6 @@ new_generator :: proc(file: string) -> Generator {
 	path := strings.concatenate({"./", chop_extension(file), ".s"})
 	defer delete(path)
 	fd, err := os.open(path, os.O_WRONLY | os.O_CREATE, 777)
-	if err != 0 {
-		fmt.println(err)
-	}
 	return Generator{m, fd}
 }
 
@@ -20,7 +17,6 @@ close_generator :: proc(gen: ^Generator) {
 	delete(gen.vars)
 	os.close(gen.out_channel)
 }
-
 
 generate_begin :: proc(gen: ^Generator) {
 	begin_assem := `
@@ -50,7 +46,6 @@ exit:
 `
 	os.write_string(gen.out_channel, end_assem)
 }
-
 
 op2 :: proc(gen: ^Generator, instr: string, reg1: string, reg2: string) {
 	assem_instr := strings.concatenate({instr, " ", reg1, ", ", reg2, "\n"})
@@ -97,7 +92,6 @@ generate_assign :: proc(gen: ^Generator, id: Token, id2: Token) {
 	}
 }
 
-
 generate_add :: proc(gen: ^Generator, d: int, l: Token, r: Token) -> Token {
 	#partial switch id1 in l {
 	case Identifier:
@@ -124,7 +118,6 @@ addop :: proc(gen: ^Generator, d: int, l: Token, r: Token) -> Token {
 	case Literal:
 		#partial switch right in r {
 		case Literal:
-			fmt.println("addop", l, r)
 			return Literal{left.lit + right.lit}
 		case Identifier:
 			return generate_add(gen, d, r, l)
@@ -151,7 +144,6 @@ generate_reads :: proc(gen: ^Generator, idens: ^[dynamic]Identifier) {
 
 read :: proc(s: ^Scanner, gen: ^Generator) -> bool {
 	if match_token(s, .Read) {
-		fmt.println("IN HERE", s)
 		if match_token(s, .LeftParen) {
 			ids := identifiers(s)
 			if len(ids) == 0 {

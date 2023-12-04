@@ -15,7 +15,6 @@ new_scanner :: proc(reader: strings.Reader) -> Scanner {
 
 scan :: proc(s: ^Scanner) -> (Token, ParseError) {
 	rr, _ := read_next_char(s)
-	fmt.println("SCAN", rr)
 
 	if is_alpha(rr) {
 		return scan_iden(&s.stm)

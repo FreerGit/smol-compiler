@@ -12,5 +12,6 @@ pkgs.mkShell {
     llvm
     clang
     lld 
+    gcc_multi
   ];
 }
