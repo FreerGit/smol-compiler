@@ -169,3 +169,52 @@ read :: proc(s: ^Scanner, gen: ^Generator) -> bool {
 		panic("Read statement expected")
 	}
 }
+
+expressions :: proc(s: ^Scanner, gen: ^Generator, c: int) -> int {
+	exp := false
+	e, err := expression(s, gen, 1)
+	#partial switch t in e {
+	case Identifier, Literal:
+		generate_write(s, gen, e)
+		exp = true
+	case:
+		exp = false
+	}
+	if exp {
+		if next_token(s) == .Comma {
+			match_token(s, .Comma)
+			return expressions(s, gen, c + 1)
+		} else {
+			return c + 1
+		}
+	} else {
+		return c
+	}
+}
+
+generate_write :: proc(s: ^Scanner, gen: ^Generator, t: Token) {
+	#partial switch id in t {
+	case Identifier:
+		push(gen, (var(gen, id)))
+		push(gen, "ouf")
+		op(gen, "    call", "   printf")
+		op2(gen, "    add", "   esp", "8")
+	case:
+		panic("generate write called without an identifier")
+	}
+}
+
+write :: proc(s: ^Scanner, gen: ^Generator) -> bool {
+	if match_token(s, .Write) {
+		if match_token(s, .LeftParen) {
+			if expressions(s, gen, 0) > 0 {
+				if match_token(s, .RightParen) {
+					return true
+				}
+			}
+		}
+	}
+	panic(
+		"Write -> LeftParen -> atleast one expressions -> RightParen, Expected!",
+	)
+}

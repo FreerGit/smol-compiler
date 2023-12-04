@@ -141,7 +141,7 @@ statement :: proc(s: ^Scanner, gen: ^Generator) -> bool {
 		case .Read:
 			stmt = read(s, gen)
 		case .Write:
-		// write(reader, gen)
+			stmt = write(s, gen)
 		}
 	case Identifier:
 		stmt = assignment(s, gen)

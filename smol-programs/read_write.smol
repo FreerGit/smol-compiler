@@ -4,5 +4,6 @@ begin
     b := b + 1;
     write (a,b);
     read(a,b);
-    write (a+10, b+10);
+    write (a+1, b+1);
+    write(2+a);
 end
