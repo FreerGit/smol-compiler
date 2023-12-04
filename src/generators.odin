@@ -38,9 +38,17 @@ exit:
 op2 :: proc(gen: ^Generator, instr: string, reg1: string, reg2: string) {
 	assem_instr := strings.concatenate({instr, " ", reg1, ", ", reg2})
 	defer delete(assem_instr)
-	fmt.println("hej")
-
 	os.write_string(gen.out_channel, assem_instr)
+}
+
+op :: proc(gen: ^Generator, instr: string, a: string) {
+	assem_instr := strings.concatenate({instr, a})
+	defer delete(assem_instr)
+	os.write_string(gen.out_channel, assem_instr)
+}
+
+push :: proc(gen: ^Generator, a: string) {
+	op(gen, "push", a)
 }
 
 generate_copy :: proc(gen: ^Generator, id: Identifier, id2: Token) {
@@ -102,4 +110,14 @@ addop :: proc(gen: ^Generator, d: int, l: Token, r: Token) -> Token {
 	}
 
 	panic("Expected literal or identifier for add op")
+}
+
+generate_reads :: proc(gen: ^Generator, idens: ^[dynamic]Identifier) {
+	for id in idens {
+		op2(gen, "lea", "eax", var(gen, id))
+		push(gen, "eax")
+		push(gen, "inf")
+		op(gen, "call", "scanf")
+		op2(gen, "add", "esp", "8")
+	}
 }

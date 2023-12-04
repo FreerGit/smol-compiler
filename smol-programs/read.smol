@@ -1,0 +1,6 @@
+begin
+    a := 1;
+    b := a + 1;
+    b := b + 1;
+    read(a,b);
+end

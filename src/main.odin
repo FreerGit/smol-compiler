@@ -137,7 +137,7 @@ statement :: proc(reader: ^strings.Reader, gen: ^Generator) -> bool {
 	case TokenSimple:
 		#partial switch v {
 		case .Read:
-		// read(reader, gen)
+			read(reader, gen)
 		case .Write:
 		// write(reader, gen)
 		}
@@ -199,6 +199,8 @@ expression :: proc(
 			fmt.println("xx")
 			fmt.println(next_token, r, primary)
 			return addop(gen, d + 1, next_token, r), .None
+		} else if t == .SemiColon {
+			return t, .None
 		}
 	}
 	fmt.println(primary, next_token)
@@ -216,11 +218,47 @@ assignment :: proc(id: Identifier, reader: ^strings.Reader, gen: ^Generator) {
 		case Literal:
 			generate_assign(gen, id, id2)
 		case Identifier:
+			generate_assign(gen, id, id2)
 		case:
 			panic("Literal or identifier expected")
 		}
 	} else {
 		panic("Assignment symbol expected")
+	}
+}
+
+identifiers :: proc(reader: ^strings.Reader) -> [dynamic]Identifier {
+	idens: [dynamic]Identifier
+	for {
+		token, err := scan_token(reader)
+		#partial switch t in token {
+		case Identifier:
+			next_t, err := scan_token(reader)
+			if next_t == .Comma {
+				append_elem(&idens, t)
+			}
+		case:
+			return idens
+		}
+	}
+}
+
+read :: proc(reader: ^strings.Reader, gen: ^Generator) {
+	token, err := scan_token(reader)
+	if token == .LeftParen {
+		ids := identifiers(reader)
+		if len(ids) == 0 {
+			panic("Read statement expects comma seperated identifier(s)")
+		} else {
+			next_t, err := scan_token(reader)
+			if next_t == .RightParen {
+				generate_reads(gen, &ids)
+			} else {
+				panic("Right paren expected in read statement")
+			}
+		}
+	} else {
+		panic("Left paren expected in read statement")
 	}
 }
 
